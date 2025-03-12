@@ -13,20 +13,10 @@
         android:theme="@style/Theme.FirstApplication"
         tools:targetApi="31">
         <activity
-            android:name=".SignIn"
-            android:exported="false"
-            android:theme="@style/Theme.FirstApplication" />
-        <activity
-            android:name=".EditStudentActivity"
+            android:name=".Register"
             android:exported="false" />
         <activity
-            android:name=".StudentDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AddStudentActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ViewStudentsActivity"
+            android:name=".SignInActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,7 +28,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.FirstApplication"></activity>
+            android:theme="@style/Theme.FirstApplication" />
     </application>
 
 </manifest>
