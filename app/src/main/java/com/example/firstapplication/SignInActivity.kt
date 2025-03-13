@@ -15,7 +15,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
 class SignInActivity : AppCompatActivity() {
@@ -40,7 +39,7 @@ class SignInActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        FirebaseApp.initializeApp(this)
+
 
         auth = FirebaseAuth.getInstance()
 
@@ -57,7 +56,7 @@ class SignInActivity : AppCompatActivity() {
         }
 
         register?.setOnClickListener {
-            startActivity(Intent(this, Register::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         forgotPassword?.setOnClickListener {
