@@ -39,7 +39,7 @@ class SignInActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+//        FirebaseApp.initializeApp(this)
 
         auth = FirebaseAuth.getInstance()
 
@@ -56,7 +56,8 @@ class SignInActivity : AppCompatActivity() {
         }
 
         register?.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
 
         forgotPassword?.setOnClickListener {

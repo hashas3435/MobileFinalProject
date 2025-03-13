@@ -3,9 +3,11 @@ package com.example.firstapplication
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Button
 import android.widget.ProgressBar
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -20,17 +22,17 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    private var fullName: TextInputEditText? = null
+    private var fullNameField: TextInputEditText? = null
     private var fullNameLayout: TextInputLayout? = null
-    private var email: TextInputEditText? = null
+    private var emailField: TextInputEditText? = null
     private var emailLayout: TextInputLayout? = null
-    private var password: TextInputEditText? = null
+    private var passwordField: TextInputEditText? = null
     private var passwordLayout: TextInputLayout? = null
-    private var confirmPassword: TextInputEditText? = null
+    private var confirmPasswordField: TextInputEditText? = null
     private var confirmPasswordLayout: TextInputLayout?= null
     private var progressBar: ProgressBar? = null
-    var buttonSignIn: Button? = null
-    var buttonRegister: Button? = null
+    private var buttonSignIn: TextView? = null
+    private var buttonRegister: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,13 +47,13 @@ class RegisterActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
 
-        fullName = findViewById(R.id.full_name)
+        fullNameField = findViewById(R.id.full_name)
         fullNameLayout = findViewById(R.id.full_name_layout)
-        email = findViewById(R.id.email)
+        emailField = findViewById(R.id.email)
         emailLayout = findViewById(R.id.email_layout)
-        password = findViewById(R.id.password)
+        passwordField = findViewById(R.id.password)
         passwordLayout = findViewById(R.id.password_layout)
-        confirmPassword = findViewById(R.id.confirm_password)
+        confirmPasswordField = findViewById(R.id.confirm_password)
         confirmPasswordLayout = findViewById(R.id.confirm_password_layout)
 
 
@@ -68,10 +70,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun registerUser() {
-        val fullName = fullName?.text.toString().trim()
-        val email = email?.text.toString().trim()
-        val password = password?.text.toString().trim()
-        val confirmPassword = confirmPassword?.text.toString().trim()
+        val fullName = fullNameField?.text.toString().trim()
+        val email = emailField?.text.toString().trim()
+        val password = passwordField?.text.toString().trim()
+        val confirmPassword = confirmPasswordField?.text.toString().trim()
 
         if (!validateForm(fullName, email, password, confirmPassword)) {
             return
@@ -96,9 +98,9 @@ class RegisterActivity : AppCompatActivity() {
                             progressBar?.visibility = View.GONE
                             Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
 
-                            // Navigate to main activity
-                            startActivity(Intent(this, MainActivity::class.java))
-                            finishAffinity() // Close all activities in the task
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finishAffinity()
                         }
                         .addOnFailureListener { e ->
                             progressBar?.visibility = View.GONE
@@ -106,9 +108,9 @@ class RegisterActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT).show()
                         }
                 } else {
-                    // If registration fails
                     progressBar?.visibility = View.GONE
-                    Toast.makeText(this, "Registration failed: ${task.exception?.message}",
+
+                    Toast.makeText(this, "${task.exception?.message}",
                         Toast.LENGTH_SHORT).show()
                 }
             }
@@ -126,7 +128,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         if (TextUtils.isEmpty(email)) {
-            fullNameLayout?.error = "Required"
+            emailLayout?.error = "Required"
             valid = false
         } else if (!isValidEmail(email)) {
             emailLayout?.error = "Enter a valid email address"
