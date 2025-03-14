@@ -20,11 +20,11 @@ import com.google.firebase.auth.FirebaseAuth
 class SignInActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
-    private var email: TextInputEditText? = null
+    private var emailField: TextInputEditText? = null
     private var emailLayout: TextInputLayout? = null
-    private var password: TextInputEditText? = null
+    private var passwordField: TextInputEditText? = null
     private var passwordLayout: TextInputLayout? = null
-    private var forgotPassword: TextView? = null
+    private var forgotPasswordField: TextView? = null
     private var loginButton: Button? = null
     private var register: TextView? = null
     private var progressBar: ProgressBar? = null
@@ -43,11 +43,11 @@ class SignInActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        email = findViewById(R.id.email)
+        emailField = findViewById(R.id.email)
         emailLayout = findViewById(R.id.email_layout)
-        password = findViewById(R.id.password)
+        passwordField = findViewById(R.id.password)
         passwordLayout = findViewById(R.id.password_layout)
-        forgotPassword = findViewById(R.id.forgot_password)
+        forgotPasswordField = findViewById(R.id.forgot_password)
         loginButton = findViewById(R.id.login_button)
         register = findViewById(R.id.register)
 
@@ -60,8 +60,8 @@ class SignInActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        forgotPassword?.setOnClickListener {
-            val email = email?.text.toString().trim()
+        forgotPasswordField?.setOnClickListener {
+            val email = emailField?.text.toString().trim()
             if (isValidEmail(email)) {
                 sendPasswordResetEmail(email)
             } else {
@@ -71,8 +71,8 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun loginUser() {
-        val email = email?.text.toString().trim()
-        val password = password?.text.toString().trim()
+        val email = emailField?.text.toString().trim()
+        val password = passwordField?.text.toString().trim()
 
         if (!validateForm(email, password)) {
             return
