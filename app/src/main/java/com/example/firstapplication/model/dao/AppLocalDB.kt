@@ -10,6 +10,7 @@ import com.example.firstapplication.model.Auction
 abstract class AppLocalDbRepository : RoomDatabase() {
     abstract fun auctionDao(): AuctionDao
 }
+
 object AppLocalDb {
     val database: AppLocalDbRepository by lazy {
         val context = MyApplication.Globals.context
