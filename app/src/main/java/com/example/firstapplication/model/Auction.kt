@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Auction(
     @PrimaryKey val id: String,
     val title: String,
+    val description: String,
     val endDate: Long,
     val imageUrl: String,
     val currentBid: Int,
@@ -15,6 +16,7 @@ data class Auction(
     companion object {
         private const val ID_KEY = "id"
         private const val TITLE_KEY = "title"
+        private const val DESCRIPTION_KEY = "description"
         private const val END_DATE_KEY = "endDate"
         private const val IMAGE_URL_KEY = "imageUrl"
         private const val CURRENT_BID_KEY = "currentBid"
@@ -23,6 +25,7 @@ data class Auction(
         fun fromJSON(json: Map<String, Any>): Auction {
             val id = json[ID_KEY] as? String ?: "0"
             val title = json[TITLE_KEY] as? String ?: ""
+            val description = json[DESCRIPTION_KEY] as? String ?: ""
             val endDate = json[END_DATE_KEY] as? Long ?: 0
             val imageUrl = json[IMAGE_URL_KEY] as? String ?: ""
             val currentBid = json[CURRENT_BID_KEY] as? Int ?: 0
@@ -30,7 +33,8 @@ data class Auction(
 
             return Auction(
                 id = id,
-                title = title,
+                title = title.trim(),
+                description = description.trim(),
                 endDate = endDate,
                 currentBid = currentBid,
                 imageUrl = imageUrl,
