@@ -1,5 +1,6 @@
 package com.example.firstapplication
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.firstapplication.databinding.FragmentCreateAuctionBinding
+import com.example.firstapplication.model.Auction
+import com.example.firstapplication.model.AuctionModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -18,7 +21,7 @@ import java.util.Locale
 
 class CreateAuctionFragment : Fragment() {
     private var binding: FragmentCreateAuctionBinding? = null
-    private var pickedTimestamp: Long = MaterialDatePicker.todayInUtcMilliseconds()
+    private var pickedTimestamp: Long = 0
     private var cameraLauncher: ActivityResultLauncher<Void?>? = null
     private var didSetProfileImage = false
     private val dateFormater = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
@@ -28,35 +31,66 @@ class CreateAuctionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentCreateAuctionBinding.inflate(inflater, container, false)
+        this.binding = binding
 
-        cameraLauncher =
-            registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-                binding.itemImageView.setImageBitmap(bitmap)
-                didSetProfileImage = true
-            }
+        cameraLauncher = createCameraLauncher()
         binding.takePictureButton.setOnClickListener {
             cameraLauncher?.launch(null)
         }
-
         binding.expireDateDatePickerButton.setOnClickListener {
             showFutureDatePicker()
         }
+        updatePickedDate(Calendar.getInstance().timeInMillis)
+        binding.createAuctionButton.setOnClickListener { this.createAuction() }
 
-        binding.pickedTimeTextView.text =
-            getString(R.string.auction_expire_at, dateFormater.format(Date(pickedTimestamp)))
-
-        binding.createAuctionButton.setOnClickListener {
-//            val auction = Auction(
-//                title = binding.titleEditText.text.toString(),
-//                currentBid = binding.startingBidTextField.text.toString().toInt(),
-//                endDate = pickedTimestamp,
-//                imageUrl = ""
-//            )
-//            AuctionModel.shared.addAuction(auction) { }
-        }
-
-        this.binding = binding
         return binding.root
+    }
+
+    private fun getBinding(): FragmentCreateAuctionBinding {
+        return binding ?: throw IllegalStateException("CreateAuctionFragment binding is null")
+    }
+
+    private fun createCameraLauncher(): ActivityResultLauncher<Void?> {
+        return registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            bitmap?.let {
+                getBinding().itemImageView.setImageBitmap(it)
+                didSetProfileImage = true
+            }
+        }
+    }
+
+    private fun updatePickedDate(timestamp: Long) {
+        pickedTimestamp = timestamp
+        getBinding().pickedTimeTextView.text =
+            getString(R.string.auction_expire_at, dateFormater.format(Date(timestamp)))
+    }
+
+    private fun createAuction() {
+        val binding = getBinding()
+        val auction = Auction(
+            id = "",
+            title = binding.titleEditText.text.toString(),
+            description = binding.descriptionEditText.text.toString(),
+            currentBid = binding.startingBidEditText.text.toString().toInt(),
+            endDate = pickedTimestamp,
+            imageUrl = "",
+            seller = "" // TODO: use logged user
+        )
+
+        if (didSetProfileImage) {
+            binding.itemImageView.isDrawingCacheEnabled = true
+            binding.itemImageView.buildDrawingCache()
+            val bitmap = (binding.itemImageView.drawable as BitmapDrawable).bitmap
+            AuctionModel.shared.addAuction(auction, bitmap) {
+                binding.progressBar.visibility = View.GONE
+                // Navigation.findNavController(view).popBackStack()
+            }
+        } else {
+            AuctionModel.shared.addAuction(auction, null) {
+                binding.progressBar.visibility = View.GONE
+                // Navigation.findNavController(view).popBackStack()
+            }
+        }
     }
 
     private fun showFutureDatePicker() {
@@ -73,9 +107,7 @@ class CreateAuctionFragment : Fragment() {
             .build()
 
         datePicker.addOnPositiveButtonClickListener { selectedTimestamp ->
-            this@CreateAuctionFragment.pickedTimestamp = selectedTimestamp
-            binding?.pickedTimeTextView?.text =
-                getString(R.string.auction_expire_at, dateFormater.format(Date(pickedTimestamp)))
+            updatePickedDate(selectedTimestamp)
         }
 
         datePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
