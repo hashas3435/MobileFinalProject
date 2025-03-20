@@ -10,7 +10,6 @@ import com.google.firebase.storage.storage
 import java.io.ByteArrayOutputStream
 
 class FirebaseModel {
-
     private val database = Firebase.firestore
     private val storage = Firebase.storage
 
@@ -27,11 +26,11 @@ class FirebaseModel {
             .addOnCompleteListener {
                 when (it.isSuccessful) {
                     true -> {
-                        val students: MutableList<Auction> = mutableListOf()
+                        val auctions: MutableList<Auction> = mutableListOf()
                         for (json in it.result) {
-                            students.add(Auction.fromJSON(json.data))
+                            auctions.add(Auction.fromJSON(json.data))
                         }
-                        callback(students)
+                        callback(auctions)
                     }
 
                     false -> callback(listOf())

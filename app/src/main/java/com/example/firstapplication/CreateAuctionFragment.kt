@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import com.example.firstapplication.databinding.FragmentCreateAuctionBinding
 import com.example.firstapplication.model.Auction
 import com.example.firstapplication.model.AuctionModel
@@ -41,7 +42,10 @@ class CreateAuctionFragment : Fragment() {
             showFutureDatePicker()
         }
         updatePickedDate(Calendar.getInstance().timeInMillis)
-        binding.createAuctionButton.setOnClickListener { this.createAuction() }
+        binding.createAuctionButton.setOnClickListener(::onCreateAuctionClick)
+        binding.cancelButton.setOnClickListener { view ->
+            Navigation.findNavController(view).popBackStack()
+        }
 
         return binding.root
     }
@@ -65,7 +69,7 @@ class CreateAuctionFragment : Fragment() {
             getString(R.string.auction_expire_at, dateFormater.format(Date(timestamp)))
     }
 
-    private fun createAuction() {
+    private fun onCreateAuctionClick(view: View) {
         val binding = getBinding()
         val auction = Auction(
             id = "",
@@ -83,12 +87,12 @@ class CreateAuctionFragment : Fragment() {
             val bitmap = (binding.itemImageView.drawable as BitmapDrawable).bitmap
             AuctionModel.shared.addAuction(auction, bitmap) {
                 binding.progressBar.visibility = View.GONE
-                // Navigation.findNavController(view).popBackStack()
+                Navigation.findNavController(view).popBackStack()
             }
         } else {
             AuctionModel.shared.addAuction(auction, null) {
                 binding.progressBar.visibility = View.GONE
-                // Navigation.findNavController(view).popBackStack()
+                Navigation.findNavController(view).popBackStack()
             }
         }
     }
