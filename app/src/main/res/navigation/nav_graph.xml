@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/auctionsListFragment">
+    <fragment
+        android:id="@+id/auctionsListFragment"
+        android:name="com.example.firstapplication.AuctionsListFragment"
+        android:label="fragment_auctions_list"
+        tools:layout="@layout/fragment_auctions_list" />
+    <fragment
+        android:id="@+id/createAuctionFragment"
+        android:name="com.example.firstapplication.CreateAuctionFragment"
+        android:label="new auction"
+        tools:layout="@layout/fragment_create_auction" /><action android:id="@+id/action_global_createAuctionFragment" app:destination="@id/createAuctionFragment"/>
+</navigation>
