@@ -21,7 +21,7 @@ class FirebaseModel {
         database.firestoreSettings = setting
     }
 
-    fun getAllAuctions(callback: AuctionsCallback) {
+    fun getAllAuctions(callback: AuctionsListCallback) {
         database.collection(Constants.COLLECTIONS.AUCTIONS).get()
             .addOnCompleteListener {
                 when (it.isSuccessful) {
@@ -38,12 +38,41 @@ class FirebaseModel {
             }
     }
 
-    fun add(auction: Auction, callback: EmptyCallback) {
-        database.collection(Constants.COLLECTIONS.AUCTIONS).document(auction.id)
-            .set(auction.json)
-            .addOnCompleteListener {
-                callback()
+    fun getAuctionById(auctionId: String, callback: AuctionCallback) {
+        database.collection(Constants.COLLECTIONS.AUCTIONS)
+            .document(auctionId)
+            .get()
+            .addOnSuccessListener { document ->
+                val auction = document.toObject(Auction::class.java)?.copy(id = document.id)
+                callback(auction, null)
             }
+            .addOnFailureListener { exception ->
+                callback(null, exception)
+            }
+    }
+
+    fun add(auction: Auction, callback: CreatedDocumentCallback) {
+        val auctionDataToAdd = auction.json
+        auctionDataToAdd.remove(Auction.ID_KEY)
+
+        database.collection(Constants.COLLECTIONS.AUCTIONS)
+            .add(auctionDataToAdd)
+            .addOnSuccessListener { documentReference ->
+                callback(documentReference.id, null)  // Return the generated document ID
+            }
+            .addOnFailureListener { e ->
+                callback(null, e)  // Return error if something goes wrong
+            }
+    }
+
+    fun updateImageUrl(auctionId: String, uri: String, callback: NullableExceptionCallback) {
+        database.collection(Constants.COLLECTIONS.AUCTIONS)
+            .document(auctionId)
+            .update(Auction.IMAGE_URL_KEY, uri)
+            .addOnSuccessListener {
+                callback(null)
+            }
+            .addOnFailureListener(callback)
     }
 
     fun uploadImage(image: Bitmap, name: String, callback: (String?) -> Unit) {
@@ -61,5 +90,24 @@ class FirebaseModel {
                     callback(uri.toString())
                 }
             }
+    }
+
+    fun placeBid(auctionId: String, bid: Double, callback: UpdateBidCallback) {
+        val auctionRef = database.collection(Constants.COLLECTIONS.AUCTIONS).document(auctionId)
+        database.runTransaction { transaction ->
+            val snapshot = transaction.get(auctionRef)
+            val currentBid = snapshot.getDouble(Auction.CURRENT_BID_KEY) ?: 0.0
+
+            if (bid > currentBid) {
+                transaction.update(auctionRef, Auction.CURRENT_BID_KEY, bid)
+                true
+            } else {
+                false
+            }
+        }.addOnSuccessListener { success ->
+            callback(success, null)
+        }.addOnFailureListener { e ->
+            callback(false, e)
+        }
     }
 }
