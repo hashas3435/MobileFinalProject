@@ -3,15 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/auctionsListFragment">
+    app:startDestination="@id/signInFragment">
+
     <fragment
-        android:id="@+id/auctionsListFragment"
-        android:name="com.example.firstapplication.AuctionsListFragment"
-        android:label="fragment_auctions_list"
-        tools:layout="@layout/fragment_auctions_list" />
+        android:id="@+id/signInFragment"
+        android:name="com.example.firstapplication.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in">
+        <action
+            android:id="@+id/action_signInFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
     <fragment
-        android:id="@+id/createAuctionFragment"
-        android:name="com.example.firstapplication.CreateAuctionFragment"
-        android:label="new auction"
-        tools:layout="@layout/fragment_create_auction" /><action android:id="@+id/action_global_createAuctionFragment" app:destination="@id/createAuctionFragment"/>
+        android:id="@+id/registerFragment"
+        android:name="com.example.firstapplication.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" >
+    </fragment>
 </navigation>
