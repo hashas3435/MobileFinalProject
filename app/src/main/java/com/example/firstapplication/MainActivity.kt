@@ -1,12 +1,14 @@
 package com.example.firstapplication
 
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -14,7 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : AppCompatActivity() {
-    var navController: NavController? = null
+    private var navController: NavController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +33,20 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment?.navController
 
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_bar)
+        bottomNavigationView.updatePadding(bottom = 0)
         navController?.let { NavigationUI.setupWithNavController(bottomNavigationView, it) }
+        navController?.addOnDestinationChangedListener { _, destination, _ ->
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+            // hide navigation bar on login and register
+            when (destination.id) {
+                R.id.signInFragment, R.id.registerFragment -> {
+                    bottomNavigationView.visibility = View.GONE
+                }
+                else -> {
+                    bottomNavigationView.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
