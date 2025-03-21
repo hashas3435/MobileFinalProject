@@ -3,14 +3,12 @@ package com.example.firstapplication
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
@@ -26,7 +24,9 @@ class RegisterFragment : Fragment() {
     private var fullNameField: TextInputEditText? = null
     private var fullNameLayout: TextInputLayout? = null
     private var emailField: TextInputEditText? = null
+    private var phoneField: TextInputEditText? = null
     private var emailLayout: TextInputLayout? = null
+    private var phoneLayout: TextInputLayout? = null
     private var passwordField: TextInputEditText? = null
     private var passwordLayout: TextInputLayout? = null
     private var confirmPasswordField: TextInputEditText? = null
@@ -48,6 +48,8 @@ class RegisterFragment : Fragment() {
         fullNameLayout = view.findViewById(R.id.full_name_layout)
         emailField = view.findViewById(R.id.email)
         emailLayout = view.findViewById(R.id.email_layout)
+        phoneField = view.findViewById(R.id.phone)
+        phoneLayout = view.findViewById(R.id.phone_layout)
         passwordField = view.findViewById(R.id.password)
         passwordLayout = view.findViewById(R.id.password_layout)
         confirmPasswordField = view.findViewById(R.id.confirm_password)
@@ -70,10 +72,11 @@ class RegisterFragment : Fragment() {
     private fun registerUser() {
         val fullName = fullNameField?.text.toString().trim()
         val email = emailField?.text.toString().trim()
+        val phone = phoneField?.text.toString().trim()
         val password = passwordField?.text.toString().trim()
         val confirmPassword = confirmPasswordField?.text.toString().trim()
 
-        if (!validateForm(fullName, email, password, confirmPassword)) {
+        if (!checkInput(fullName, email, phone, password, confirmPassword)) {
             return
         }
 
@@ -87,6 +90,7 @@ class RegisterFragment : Fragment() {
                         "uid" to user?.uid,
                         "fullName" to fullName,
                         "email" to email,
+                        "phone" to phone,
                         "createdAt" to System.currentTimeMillis()
                     )
 
@@ -112,7 +116,8 @@ class RegisterFragment : Fragment() {
             }
     }
 
-    private fun validateForm(fullName: String, email: String, password: String, confirmPassword: String): Boolean {
+    private fun checkInput(fullName: String, email: String, phone: String,
+                           password: String, confirmPassword: String): Boolean {
         var valid = true
 
         if (TextUtils.isEmpty(fullName)) {
@@ -130,6 +135,16 @@ class RegisterFragment : Fragment() {
             valid = false
         } else {
             emailLayout?.error = null
+        }
+
+        if (TextUtils.isEmpty(phone)) {
+            phoneLayout?.error = "Required"
+            valid = false
+        } else if (!isValidPhoneNumber(phone)) {
+            phoneLayout?.error = "Enter a valid phone"
+            valid = false
+        } else {
+            phoneLayout?.error = null
         }
 
         if (TextUtils.isEmpty(password)) {
@@ -158,5 +173,10 @@ class RegisterFragment : Fragment() {
     private fun isValidEmail(email: String): Boolean {
         val emailPattern = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
         return email.matches(emailPattern.toRegex())
+    }
+
+    private fun isValidPhoneNumber(phone: String): Boolean {
+        val regex = Regex("^\\+?[1-9][0-9]{7,14}$")
+        return phone.matches(regex)
     }
 }
