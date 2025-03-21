@@ -28,7 +28,9 @@ class FirebaseModel {
                     true -> {
                         val auctions: MutableList<Auction> = mutableListOf()
                         for (json in it.result) {
-                            auctions.add(Auction.fromJSON(json.data))
+                            val data = json.data
+                            data[Auction.ID_KEY] = json.id
+                            auctions.add(Auction.fromJSON(data))
                         }
                         callback(auctions)
                     }
@@ -43,8 +45,12 @@ class FirebaseModel {
             .document(auctionId)
             .get()
             .addOnSuccessListener { document ->
-                val auction = document.toObject(Auction::class.java)?.copy(id = document.id)
-                callback(auction, null)
+                val data = document.data
+                data?.let {
+                    it[Auction.ID_KEY] = document.id
+                    val auction = Auction.fromJSON(it)
+                    callback(auction, null)
+                } ?: callback(null, IllegalStateException("auction $auctionId data is null"))
             }
             .addOnFailureListener { exception ->
                 callback(null, exception)

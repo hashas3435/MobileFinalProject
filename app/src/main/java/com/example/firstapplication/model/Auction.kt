@@ -1,5 +1,6 @@
 package com.example.firstapplication.model
 
+import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,7 +11,7 @@ data class Auction(
     val description: String,
     val endDate: Long,
     val imageUrl: String,
-    val currentBid: Double,
+    var currentBid: Double,
     val seller: String
 ) {
     companion object {

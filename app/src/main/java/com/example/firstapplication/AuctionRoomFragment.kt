@@ -4,12 +4,15 @@ import android.content.Intent
 import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import com.example.firstapplication.databinding.FragmentAuctionRoomBinding
 import com.example.firstapplication.model.Auction
 import com.example.firstapplication.model.AuctionModel
@@ -45,7 +48,14 @@ class AuctionRoomFragment : Fragment() {
         binding.currentBidTextView.text = createCurrentBidText(0.0)
         fetchAuction()
 
-        binding.setBidTextEdit.doAfterTextChanged { validateBidInput() }
+        binding.setBidTextEdit.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(editText: Editable?) {
+                validateBidInput()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
         binding.contactSellerButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$sellerPhone"))
             startActivity(intent)
@@ -83,9 +93,11 @@ class AuctionRoomFragment : Fragment() {
             if (exception !== null) {
                 Toast.makeText(
                     requireContext(),
-                    "Failed to fetch auction: ${exception.message}",
+                    "Failed to fetch auction",
                     Toast.LENGTH_SHORT
                 ).show()
+                Log.e("AuctionRoom", "failed fetching auction $auctionId", exception)
+                Navigation.findNavController(binding.root).popBackStack()
             } else if (auctionData !== null) {
                 this@AuctionRoomFragment.auction = auctionData
                 updateAuctionView(auctionData)
@@ -150,6 +162,7 @@ class AuctionRoomFragment : Fragment() {
         binding.currentBidTextView.text = "current bid: $${String.format("%.2f", newBid)}"
         binding.setBidTextEdit.text?.clear()
         binding.setBidButton.isEnabled = false
+        auction?.currentBid = newBid
         Toast.makeText(requireContext(), "Bid placed successfully!", Toast.LENGTH_SHORT).show()
     }
 
@@ -168,15 +181,5 @@ class AuctionRoomFragment : Fragment() {
             ).show()
             fetchAuction()
         }
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(auctionId: String) =
-            AuctionRoomFragment().apply {
-                arguments = Bundle().apply {
-                    putString(AUCTION_ID_PARAM, auctionId)
-                }
-            }
     }
 }
