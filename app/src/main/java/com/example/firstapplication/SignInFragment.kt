@@ -80,23 +80,26 @@ class SignInFragment : Fragment() {
         if (!checkInput(email, password)) {
             return
         }
-        Log.d("SIGN_IN", "Sign In")
 
         progressBar?.visibility = View.VISIBLE
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                progressBar?.visibility = View.GONE
                 if (task.isSuccessful) {
                     val user = auth.currentUser
 
-                    Toast.makeText( requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                    updateUserModel(user?.uid ?: "") {
+                        progressBar?.visibility = View.GONE
 
-                    startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
+                        Toast.makeText( requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
 
+                        startActivity(Intent(requireContext(), MainActivity::class.java))
+                        requireActivity().finish()
+                    }
                 } else {
-                    Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    progressBar?.visibility = View.GONE
+                    Log.d("SIGN_IN", "Authentication failed: ${task.exception?.message}")
+                    Toast.makeText(requireContext(), "Password and email does not match", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -132,6 +135,20 @@ class SignInFragment : Fragment() {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
+    private fun updateUserModel(uid: String, callback: () -> Unit){
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val fullName = document.getString("fullName") ?: "No name"
+                    val email = document.getString("email") ?: "No email"
+                    val phone = document.getString("phone") ?: "No phone"
+
+                    Model.shared.user = User(fullName, email, phone)
+                }
+
+                callback()
+            }
+    }
 
     private fun sendPasswordResetEmail(email: String) {
         progressBar?.visibility = View.VISIBLE
