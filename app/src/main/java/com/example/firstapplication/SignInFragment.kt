@@ -3,6 +3,7 @@ package com.example.firstapplication
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -14,12 +15,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
+import com.example.firstapplication.model.Model
+import com.example.firstapplication.model.User
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SignInFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
+
 
     private var emailField: TextInputEditText? = null
     private var emailLayout: TextInputLayout? = null
@@ -36,6 +42,7 @@ class SignInFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_sign_in, container, false)
 
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         emailField = view.findViewById(R.id.email)
         emailLayout = view.findViewById(R.id.email_layout)
@@ -70,9 +77,10 @@ class SignInFragment : Fragment() {
         val email = emailField?.text.toString().trim()
         val password = passwordField?.text.toString().trim()
 
-        if (!validateForm(email, password)) {
+        if (!checkInput(email, password)) {
             return
         }
+        Log.d("SIGN_IN", "Sign In")
 
         progressBar?.visibility = View.VISIBLE
 
@@ -80,16 +88,21 @@ class SignInFragment : Fragment() {
             .addOnCompleteListener { task ->
                 progressBar?.visibility = View.GONE
                 if (task.isSuccessful) {
-                    Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                    val user = auth.currentUser
+
+                    Toast.makeText( requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
+
                 } else {
                     Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    private fun validateForm(email: String, password: String): Boolean {
+
+    private fun checkInput(email: String, password: String): Boolean {
         var valid = true
 
         if (TextUtils.isEmpty(email)) {
@@ -118,6 +131,7 @@ class SignInFragment : Fragment() {
     private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
+
 
     private fun sendPasswordResetEmail(email: String) {
         progressBar?.visibility = View.VISIBLE
