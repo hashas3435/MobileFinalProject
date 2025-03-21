@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.Material3.ActionBar"
-        app:title="My App Title" />
+        app:title="Auction App" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_nav_host"

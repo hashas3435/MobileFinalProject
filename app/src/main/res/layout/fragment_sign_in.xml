@@ -79,13 +79,13 @@
         android:padding="12dp"
         android:text="Login"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@+id/layout_register"
+        app:layout_constraintBottom_toTopOf="@+id/register_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/forgot_password" />
 
     <LinearLayout
-        android:id="@+id/layout_register"
+        android:id="@+id/register_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -96,6 +96,7 @@
         app:layout_constraintTop_toBottomOf="@+id/login_button">
 
         <TextView
+            android:id="@+id/register_opening"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Don't have an account? " />

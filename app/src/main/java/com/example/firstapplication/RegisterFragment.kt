@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -31,7 +32,8 @@ class RegisterFragment : Fragment() {
     private var confirmPasswordField: TextInputEditText? = null
     private var confirmPasswordLayout: TextInputLayout?= null
     private var progressBar: ProgressBar? = null
-    private var buttonSignIn: TextView? = null
+
+    private var buttonSignIn: LinearLayout? = null
     private var buttonRegister: Button? = null
 
     override fun onCreateView(
@@ -51,7 +53,7 @@ class RegisterFragment : Fragment() {
         confirmPasswordField = view.findViewById(R.id.confirm_password)
         confirmPasswordLayout = view.findViewById(R.id.confirm_password_layout)
 
-        buttonSignIn = view.findViewById(R.id.sign_in)
+        buttonSignIn = view.findViewById(R.id.sign_in_layout)
         buttonRegister = view.findViewById(R.id.register_button)
 
         buttonRegister?.setOnClickListener {

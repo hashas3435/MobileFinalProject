@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -26,7 +27,7 @@ class SignInFragment : Fragment() {
     private var passwordLayout: TextInputLayout? = null
     private var forgotPasswordField: TextView? = null
     private var loginButton: Button? = null
-    private var register: TextView? = null
+    private var register: LinearLayout? = null
     private var progressBar: ProgressBar? = null
 
     override fun onCreateView(
@@ -42,7 +43,7 @@ class SignInFragment : Fragment() {
         passwordLayout = view.findViewById(R.id.password_layout)
         forgotPasswordField = view.findViewById(R.id.forgot_password)
         loginButton = view.findViewById(R.id.login_button)
-        register = view.findViewById(R.id.register)
+        register = view.findViewById(R.id.register_layout)
         progressBar = view.findViewById(R.id.progress_bar)
 
         loginButton?.setOnClickListener {
