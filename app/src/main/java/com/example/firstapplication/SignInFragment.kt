@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
@@ -49,7 +50,7 @@ class SignInFragment : Fragment() {
         }
 
         register?.setOnClickListener {
-            startActivity(Intent(requireContext(), RegisterActivity::class.java))
+            findNavController(view).navigate(R.id.action_signInFragment_to_registerFragment)
         }
 
         forgotPasswordField?.setOnClickListener {

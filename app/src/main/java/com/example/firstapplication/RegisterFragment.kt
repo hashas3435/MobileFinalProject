@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
@@ -58,7 +59,7 @@ class RegisterFragment : Fragment() {
         }
 
         buttonSignIn?.setOnClickListener {
-            activity?.onBackPressed()
+            findNavController(view).popBackStack()
         }
 
         return view

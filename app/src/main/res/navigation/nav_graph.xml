@@ -8,19 +8,17 @@
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.example.firstapplication.SignInFragment"
-        android:label="Students List"
+        android:label="fragment_sign_in"
         tools:layout="@layout/fragment_sign_in">
         <action
             android:id="@+id/action_signInFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.firstapplication.SignInFragment"
-        android:label="fragment_blue"
+        android:name="com.example.firstapplication.RegisterFragment"
+        android:label="fragment_register"
         tools:layout="@layout/fragment_register" >
-        <action
-            android:id="@+id/action_registerFragment_to_signInFragment"
-            app:destination="@id/signInFragment" />
     </fragment>
 </navigation>
