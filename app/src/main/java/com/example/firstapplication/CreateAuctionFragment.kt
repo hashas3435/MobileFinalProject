@@ -75,7 +75,7 @@ class CreateAuctionFragment : Fragment() {
             id = "",
             title = binding.titleEditText.text.toString(),
             description = binding.descriptionEditText.text.toString(),
-            currentBid = binding.startingBidEditText.text.toString().toInt(),
+            currentBid = binding.startingBidEditText.text.toString().toDoubleOrNull() ?: 0.0,
             endDate = pickedTimestamp,
             imageUrl = "",
             seller = "" // TODO: use logged user
