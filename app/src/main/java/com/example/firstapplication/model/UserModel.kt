@@ -6,7 +6,7 @@ typealias UserCallback = (User?) -> Unit
 
 class UserModel private constructor() {
     private val userFirebaseModel = UserFirebaseModel()
-    var user: User? = null
+    var loggedUser: User? = null
 
     companion object {
         val shared = UserModel()

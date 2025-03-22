@@ -85,7 +85,7 @@ class SignInFragment : Fragment() {
 
         if (authUser !== null && authUser.uid.isNotBlank()) {
             UserModel.shared.getUserById(authUser.uid) { userData ->
-                UserModel.shared.user = userData
+                UserModel.shared.loggedUser = userData
                 Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                 binding.progressBar.visibility = View.GONE
 
