@@ -11,11 +11,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
-import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentSignInBinding
-import com.example.firstapplication.model.Model
-import com.example.firstapplication.model.User
+import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
 const val MIN_PASSWORD_LENGTH = 6
@@ -74,28 +73,42 @@ class SignInFragment : Fragment() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-
-                    updateUserModel(user?.uid ?: "") {
-                        binding.progressBar.visibility = View.GONE
-
-                        Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT)
-                            .show()
-
-                        startActivity(Intent(requireContext(), MainActivity::class.java))
-                        requireActivity().finish()
-                    }
+                    onSuccessfulSignIn(user)
                 } else {
-                    binding.progressBar.visibility = View.GONE
-                    Log.d("SIGN_IN", "Authentication failed: ${task.exception?.message}")
-                    Toast.makeText(
-                        requireContext(),
-                        "Password and email does not match",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    onFailedSignIn(task.exception)
                 }
             }
     }
 
+    private fun onSuccessfulSignIn(authUser: FirebaseUser?) {
+        val binding = getBinding()
+
+        if (authUser !== null && authUser.uid.isNotBlank()) {
+            UserModel.shared.getUserById(authUser.uid) { userData ->
+                UserModel.shared.user = userData
+                Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+
+                startActivity(Intent(requireContext(), MainActivity::class.java))
+                requireActivity().finish()
+            }
+        } else {
+            Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show()
+            binding.progressBar.visibility = View.GONE
+        }
+    }
+
+    private fun onFailedSignIn(exception: Exception?) {
+        val binding = getBinding()
+
+        binding.progressBar.visibility = View.GONE
+        Log.d("SIGN_IN", "Authentication failed: ${exception?.message}")
+        Toast.makeText(
+            requireContext(),
+            "Password and email does not match",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 
     private fun checkInput(email: String, password: String): Boolean {
         val isValidEmail = validateEmail(email)
@@ -134,20 +147,6 @@ class SignInFragment : Fragment() {
         binding.passwordLayout.error = error
 
         return error !== null
-    }
-
-    private fun updateUserModel(uid: String, callback: () -> Unit) {
-        db.collection(Constants.COLLECTIONS.USERS).document(uid).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val fullName = document.getString("fullName") ?: "No name"
-                    val email = document.getString("email") ?: "No email"
-                    val phone = document.getString("phone") ?: "No phone"
-
-                    Model.shared.user = User(document.id, fullName, email, phone)
-                }
-                callback()
-            }
     }
 
     private fun sendPasswordResetEmail(email: String) {

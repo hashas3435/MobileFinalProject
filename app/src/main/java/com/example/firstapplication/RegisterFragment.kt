@@ -6,15 +6,11 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import com.example.firstapplication.databinding.FragmentRegisterBinding
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -64,32 +60,28 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    val userMap = hashMapOf(
-                        "uid" to user?.uid,
+                    val userMap = mapOf(
                         "fullName" to fullName,
                         "email" to email,
                         "phone" to phone,
                         "createdAt" to System.currentTimeMillis()
                     )
-
-                    db.collection("users").document(user?.uid ?: email)
-                        .set(userMap)
-                        .addOnSuccessListener {
-                            binding.progressBar.visibility = View.GONE
+                    UserModel.shared.createUser(userMap, user?.uid ?: email) { userId ->
+                        if (!userId.isNullOrBlank()) {
                             Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT)
                                 .show()
 
                             val intent = Intent(activity, MainActivity::class.java)
                             startActivity(intent)
                             activity?.finishAffinity()
-                        }
-                        .addOnFailureListener { e ->
-                            binding.progressBar.visibility = View.GONE
+                        } else {
                             Toast.makeText(
-                                context, "Error creating profile: ${e.message}",
+                                context, "Failed to Register",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+                        binding.progressBar.visibility = View.GONE
+                    }
                 } else {
                     binding.progressBar.visibility = View.GONE
                     Toast.makeText(context, "${task.exception?.message}", Toast.LENGTH_SHORT).show()
