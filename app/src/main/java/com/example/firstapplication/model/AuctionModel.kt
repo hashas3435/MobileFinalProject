@@ -2,11 +2,11 @@ package com.example.firstapplication.model
 
 import android.graphics.Bitmap
 import android.util.Log
-import com.example.firstapplication.base.EmptyCallback
+import com.example.firstapplication.base.IsSuccessfulCallback
+import com.example.firstapplication.base.StringCallback
 
 typealias AuctionsListCallback = (List<Auction>) -> Unit
 typealias AuctionCallback = (Auction?) -> Unit
-typealias UpdateBidCallback = (Boolean) -> Unit
 
 private const val LOG_TAG = "AuctionModel"
 
@@ -25,7 +25,7 @@ class AuctionModel private constructor() {
         auctionFirebaseModel.getAuctionById(auctionId, callback)
     }
 
-    fun addAuction(auction: Auction, itemImage: Bitmap?, callback: EmptyCallback) {
+    fun addAuction(auction: Auction, itemImage: Bitmap?, callback: IsSuccessfulCallback) {
         auctionFirebaseModel.add(auction) { auctionId ->
             if (!auctionId.isNullOrBlank() && itemImage !== null) {
                 updateAuctionImage(auctionId, itemImage, callback)
@@ -33,7 +33,7 @@ class AuctionModel private constructor() {
                 if (auctionId.isNullOrBlank()) {
                     Log.e(LOG_TAG, "failed getting id for the new auction in firestore")
                 }
-                callback()
+                callback(!auctionId.isNullOrBlank())
             }
         }
     }
@@ -41,7 +41,7 @@ class AuctionModel private constructor() {
     private fun updateAuctionImage(
         auctionId: String,
         image: Bitmap,
-        callback: EmptyCallback
+        callback: IsSuccessfulCallback
     ) {
         uploadImageToFirebase(image, auctionId) { uri ->
             uri?.let {
@@ -50,11 +50,11 @@ class AuctionModel private constructor() {
         }
     }
 
-    private fun uploadImageToFirebase(image: Bitmap, name: String, callback: (String?) -> Unit) {
+    private fun uploadImageToFirebase(image: Bitmap, name: String, callback: StringCallback) {
         auctionFirebaseModel.uploadImage(image, name, callback)
     }
 
-    fun placeBid(auctionId: String, bid: Double, callback: UpdateBidCallback) {
+    fun placeBid(auctionId: String, bid: Double, callback: IsSuccessfulCallback) {
         auctionFirebaseModel.placeBid(auctionId, bid, callback)
     }
 }

@@ -3,7 +3,7 @@ package com.example.firstapplication.model
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.firstapplication.base.Constants
-import com.example.firstapplication.base.EmptyCallback
+import com.example.firstapplication.base.IsSuccessfulCallback
 import com.example.firstapplication.base.StringCallback
 import java.io.ByteArrayOutputStream
 
@@ -65,11 +65,12 @@ class AuctionFirebaseModel {
                 callback(documentReference.id)  // Return the generated document ID
             }
             .addOnFailureListener { exception ->
+                Log.e(LOG_TAG, "failed to create auction $auction", exception)
                 callback(null)  // Return error if something goes wrong
             }
     }
 
-    fun updateImageUrl(auctionId: String, uri: String, callback: EmptyCallback) {
+    fun updateImageUrl(auctionId: String, uri: String, callback: IsSuccessfulCallback) {
         firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS)
             .document(auctionId)
             .update(Auction.IMAGE_URL_KEY, uri)
@@ -77,7 +78,7 @@ class AuctionFirebaseModel {
                 if (!it.isSuccessful) {
                     Log.e(LOG_TAG, "failed to update image for auction $auctionId", it.exception)
                 }
-                callback()
+                callback(it.isSuccessful)
             }
     }
 
@@ -110,7 +111,7 @@ class AuctionFirebaseModel {
             }
     }
 
-    fun placeBid(auctionId: String, bid: Double, callback: UpdateBidCallback) {
+    fun placeBid(auctionId: String, bid: Double, callback: IsSuccessfulCallback) {
         val auctionRef =
             firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS).document(auctionId)
         firebaseModel.database.runTransaction { transaction ->
