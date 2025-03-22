@@ -16,6 +16,7 @@ import androidx.navigation.Navigation
 import com.example.firstapplication.databinding.FragmentAuctionRoomBinding
 import com.example.firstapplication.model.Auction
 import com.example.firstapplication.model.AuctionModel
+import com.example.firstapplication.model.UserModel
 import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -27,7 +28,7 @@ class AuctionRoomFragment : Fragment() {
     private var binding: FragmentAuctionRoomBinding? = null
     private var auctionId: String? = null
     private var auction: Auction? = null
-    private var sellerPhone: String = "0527212004"
+    private var sellerPhone: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,12 +94,37 @@ class AuctionRoomFragment : Fragment() {
             if (auctionData !== null) {
                 this@AuctionRoomFragment.auction = auctionData
                 updateAuctionView(auctionData)
+                fetchSeller(auctionData.seller)
             } else {
                 Toast.makeText(requireContext(), "failed to get auction", Toast.LENGTH_SHORT).show()
                 Navigation.findNavController(binding.root).popBackStack()
             }
             binding.progressBar.visibility = View.GONE
         }
+    }
+
+    private fun fetchSeller(sellerId: String? = null) {
+        val auctionSellerId = sellerId ?: auction?.seller ?: ""
+        if (auctionSellerId.isNotBlank()) {
+            UserModel.shared.getUserById(auctionSellerId) { seller ->
+                if (seller !== null) {
+                    val binding = getBinding()
+                    sellerPhone = seller.phone
+                    binding.contactSellerButton.isEnabled = true
+                } else {
+                    onFetchingSellerFail()
+                }
+            }
+        } else {
+            Log.e("AuctionRoomFragment", "auction sellerId is null")
+            onFetchingSellerFail()
+        }
+    }
+
+    private fun onFetchingSellerFail() {
+        val binding = getBinding()
+        Toast.makeText(context, "failed getting seller", Toast.LENGTH_SHORT).show()
+        binding.contactSellerButton.isEnabled = false
     }
 
     private fun formatBid(bid: Double): String {
