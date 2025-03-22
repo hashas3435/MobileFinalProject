@@ -1,11 +1,9 @@
 package com.example.firstapplication.model
 
-import android.graphics.Bitmap
 import android.util.Log
 import com.example.firstapplication.base.Constants
 import com.example.firstapplication.base.IsSuccessfulCallback
 import com.example.firstapplication.base.StringCallback
-import java.io.ByteArrayOutputStream
 
 private const val LOG_TAG = "AuctionFirebaseModel"
 
@@ -79,35 +77,6 @@ class AuctionFirebaseModel {
                     Log.e(LOG_TAG, "failed to update image for auction $auctionId", it.exception)
                 }
                 callback(it.isSuccessful)
-            }
-    }
-
-    fun uploadImage(image: Bitmap, auctionId: String, callback: StringCallback) {
-        val storageRef = firebaseModel.storage.reference
-        val imageProfileRef = storageRef.child("images/$auctionId.jpg")
-        val baos = ByteArrayOutputStream()
-        image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val data = baos.toByteArray()
-
-        val uploadTask = imageProfileRef.putBytes(data)
-        uploadTask
-            .addOnFailureListener { exception ->
-                Log.e(LOG_TAG, "failed to upload image for auction $auctionId", exception)
-                callback(null)
-            }
-            .addOnSuccessListener { _ ->
-                imageProfileRef.downloadUrl
-                    .addOnSuccessListener { uri ->
-                        callback(uri.toString())
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.e(
-                            LOG_TAG,
-                            "failed downloading image url for auction $auctionId",
-                            exception
-                        )
-                        callback(null)
-                    }
             }
     }
 

@@ -12,6 +12,7 @@ private const val LOG_TAG = "AuctionModel"
 
 class AuctionModel private constructor() {
     private val auctionFirebaseModel = AuctionFirebaseModel()
+    private val cloudinaryModel = CloudinaryModel()
 
     companion object {
         val shared = AuctionModel()
@@ -51,7 +52,7 @@ class AuctionModel private constructor() {
     }
 
     private fun uploadImageToFirebase(image: Bitmap, name: String, callback: StringCallback) {
-        auctionFirebaseModel.uploadImage(image, name, callback)
+        cloudinaryModel.uploadBitmap(image, name, callback)
     }
 
     fun placeBid(auctionId: String, bid: Double, callback: IsSuccessfulCallback) {
