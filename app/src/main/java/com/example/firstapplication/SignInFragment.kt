@@ -11,13 +11,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
+import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentSignInBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-
-const val MIN_PASSWORD_LENGTH = 6
 
 class SignInFragment : Fragment() {
     private var binding: FragmentSignInBinding? = null
@@ -138,11 +137,12 @@ class SignInFragment : Fragment() {
     private fun validatePassword(password: String): Boolean {
         val binding = getBinding()
         var error: String? = null
+        val minLength = Constants.COLLECTIONS.MIN_PASSWORD_LENGTH
 
         if (TextUtils.isEmpty(password)) {
             error = "Password is required"
-        } else if (password.length < MIN_PASSWORD_LENGTH) {
-            error = "Password must be at least $MIN_PASSWORD_LENGTH characters"
+        } else if (password.length < minLength) {
+            error = "Password must be at least $minLength characters"
         }
         binding.passwordLayout.error = error
 

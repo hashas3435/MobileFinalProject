@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
+import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentRegisterBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
@@ -158,11 +159,12 @@ class RegisterFragment : Fragment() {
     private fun validatePassword(password: String): Boolean {
         val binding = getBinding()
         var error: String? = null
+        val minLength = Constants.COLLECTIONS.MIN_PASSWORD_LENGTH
 
         if (TextUtils.isEmpty(password)) {
             error = "Required"
-        } else if (password.length < 6) {
-            error = "Password must be at least 6 characters"
+        } else if (password.length < minLength) {
+            error = "Password must be at least $minLength characters"
         }
 
         binding.passwordLayout.error = error
