@@ -9,7 +9,7 @@
     tools:context=".RegisterFragment">
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/auction_row_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Account"
@@ -31,7 +31,7 @@
         app:layout_constraintBottom_toTopOf="@+id/email_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title">
+        app:layout_constraintTop_toBottomOf="@+id/auction_row_title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/full_name"

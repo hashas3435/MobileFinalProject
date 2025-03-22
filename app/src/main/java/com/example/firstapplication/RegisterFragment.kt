@@ -1,6 +1,5 @@
 package com.example.firstapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -11,15 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentRegisterBinding
+import com.example.firstapplication.model.User
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterFragment : Fragment() {
     private var binding: FragmentRegisterBinding? = null
 
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -72,9 +70,10 @@ class RegisterFragment : Fragment() {
                             Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT)
                                 .show()
 
-                            val intent = Intent(activity, MainActivity::class.java)
-                            startActivity(intent)
-                            activity?.finishAffinity()
+                            UserModel.shared.loggedUser = User.fromJSON(userMap, userId)
+                            val action =
+                                RegisterFragmentDirections.actionRegisterFragmentToAuctionsListFragment()
+                            findNavController(binding.root).navigate(action)
                         } else {
                             Toast.makeText(
                                 context, "Failed to Register",
@@ -183,5 +182,10 @@ class RegisterFragment : Fragment() {
 
         binding.confirmPasswordLayout.error = error
         return error === null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 }

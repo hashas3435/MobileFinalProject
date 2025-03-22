@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.firstapplication.databinding.FragmentAuctionRoomBinding
 import com.example.firstapplication.model.Auction
 import com.example.firstapplication.model.AuctionModel
@@ -192,5 +193,10 @@ class AuctionRoomFragment : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
         fetchAuction()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 }

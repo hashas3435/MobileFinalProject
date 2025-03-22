@@ -1,9 +1,7 @@
 package com.example.firstapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -16,13 +14,11 @@ import com.example.firstapplication.databinding.FragmentSignInBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 
 class SignInFragment : Fragment() {
     private var binding: FragmentSignInBinding? = null
 
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -83,12 +79,26 @@ class SignInFragment : Fragment() {
         val binding = getBinding()
         if (authUser !== null && authUser.uid.isNotBlank()) {
             UserModel.shared.getUserById(authUser.uid) { userData ->
-                UserModel.shared.loggedUser = userData
-                Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
-                binding.progressBar.visibility = View.GONE
+                val navController = findNavController(binding.root)
+                if (userData !== null) {
+                    UserModel.shared.loggedUser = userData
+                    Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
 
-                startActivity(Intent(requireContext(), MainActivity::class.java))
-                requireActivity().finish()
+                    val action =
+                        SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
+                    navController.navigate(action)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "something wrong with your user, please register again",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    val action =
+                        SignInFragmentDirections.actionSignInFragmentToRegisterFragment()
+                    navController.navigate(action)
+                }
             }
         } else {
             Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show()
@@ -168,5 +178,10 @@ class SignInFragment : Fragment() {
                     ).show()
                 }
             }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 }
