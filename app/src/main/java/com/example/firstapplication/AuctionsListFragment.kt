@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.firstapplication.adapter.AuctionsRecyclerAdapter
 import com.example.firstapplication.adapter.OnItemClickListener
@@ -56,18 +57,19 @@ class AuctionsListFragment : Fragment() {
 
             override fun onItemClick(auction: Auction?) {
                 auction?.let {
-//                    val action = AuctionsListFragmentDirections.actionStudentsListFragmentToBlueFragment(it.name)
-//                    binding?.root?.let {
-//                        Navigation.findNavController(it).navigate(action)
-//                    }
+                    val action = AuctionsListFragmentDirections.
+                    actionAuctionsListFragmentToAuctionRoomFragment(it.id)
+                    binding?.root?.let {
+                        Navigation.findNavController(it).navigate(action)
+                    }
                 }
             }
         }
 
         binding?.recyclerView?.adapter = adapter
 
-//        val action = StudentsListFragmentDirections.actionGlobalAddStudentFragment()
-//        binding?.addStudentButton?.setOnClickListener(Navigation.createNavigateOnClickListener(action))
+        val action = AuctionsListFragmentDirections.actionAuctionsListFragmentToCreateAuctionFragment()
+        binding?.addAuctionButton?.setOnClickListener(Navigation.createNavigateOnClickListener(action))
 
         return binding?.root
     }
