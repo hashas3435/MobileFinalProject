@@ -115,7 +115,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.fullNameLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun isValidEmail(email: String): Boolean {
@@ -134,7 +134,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.emailLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun isValidPhoneNumber(phone: String): Boolean {
@@ -153,7 +153,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.phoneLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun validatePassword(password: String): Boolean {
@@ -168,7 +168,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.passwordLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun validateConfirmPassword(password: String, confirmPassword: String): Boolean {
@@ -182,6 +182,6 @@ class RegisterFragment : Fragment() {
         }
 
         binding.confirmPasswordLayout.error = error
-        return error !== null
+        return error === null
     }
 }
