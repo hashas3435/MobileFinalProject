@@ -2,4 +2,5 @@
     <string name="app_name">First Application</string>
     <string name="add_sign">+</string>
     <string name="auction_expire_at">Auction will end at %1$s</string>
+    <string name="add_auction">Add Auction</string>
 </resources>

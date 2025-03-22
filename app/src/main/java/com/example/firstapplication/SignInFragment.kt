@@ -87,7 +87,9 @@ class SignInFragment : Fragment() {
                 Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                 binding.progressBar.visibility = View.GONE
 
-                startActivity(Intent(requireContext(), MainActivity::class.java))
+//                startActivity(Intent(requireContext(), MainActivity::class.java))
+                val action = SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
+                findNavController(binding.root).navigate(action)
                 requireActivity().finish()
             }
         } else {
