@@ -81,7 +81,7 @@ class SignInFragment : Fragment() {
             UserModel.shared.getUserById(authUser.uid) { userData ->
                 val navController = findNavController(binding.root)
                 if (userData !== null) {
-                    UserModel.shared.setLoggedUser(userData)
+                    UserModel.shared.loggedUser = userData
                     Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                     binding.progressBar.visibility = View.GONE
 

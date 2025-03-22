@@ -1,6 +1,5 @@
 package com.example.firstapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -71,8 +70,9 @@ class RegisterFragment : Fragment() {
                             Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT)
                                 .show()
 
-                            UserModel.shared.setLoggedUser(User.fromJSON(userMap, userId))
-                            val action = RegisterFragmentDirections.actionRegisterFragmentToAuctionsListFragment()
+                            UserModel.shared.loggedUser = User.fromJSON(userMap, userId)
+                            val action =
+                                RegisterFragmentDirections.actionRegisterFragmentToAuctionsListFragment()
                             findNavController(binding.root).navigate(action)
                         } else {
                             Toast.makeText(
