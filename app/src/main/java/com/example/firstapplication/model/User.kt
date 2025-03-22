@@ -1,6 +1,8 @@
 package com.example.firstapplication.model
 
-class User (val fullName: String,
-            val email: String,
-            val phone: String) {
-}
+class User (
+    val id: String,
+    val fullName: String,
+    val email: String,
+    val phone: String
+)
