@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentRegisterBinding
+import com.example.firstapplication.model.User
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -70,6 +71,7 @@ class RegisterFragment : Fragment() {
                             Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT)
                                 .show()
 
+                            UserModel.shared.setLoggedUser(User.fromJSON(userMap, userId))
                             val action = RegisterFragmentDirections.actionRegisterFragmentToAuctionsListFragment()
                             findNavController(binding.root).navigate(action)
                         } else {

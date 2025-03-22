@@ -19,4 +19,8 @@ class UserModel private constructor() {
     fun createUser(userData: Map<String, Any>, authId: String, callback: StringCallback) {
         userFirebaseModel.createUser(userData, authId, callback)
     }
+
+    fun setLoggedUser(user: User) {
+        loggedUser = user
+    }
 }

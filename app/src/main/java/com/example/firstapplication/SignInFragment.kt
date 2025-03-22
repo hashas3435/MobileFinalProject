@@ -79,12 +79,26 @@ class SignInFragment : Fragment() {
         val binding = getBinding()
         if (authUser !== null && authUser.uid.isNotBlank()) {
             UserModel.shared.getUserById(authUser.uid) { userData ->
-                UserModel.shared.loggedUser = userData
-                Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
-                binding.progressBar.visibility = View.GONE
+                val navController = findNavController(binding.root)
+                if (userData !== null) {
+                    UserModel.shared.setLoggedUser(userData)
+                    Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
 
-                val action = SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
-                findNavController(binding.root).navigate(action)
+                    val action =
+                        SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
+                    navController.navigate(action)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "something wrong with your user, please register again",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    val action =
+                        SignInFragmentDirections.actionSignInFragmentToRegisterFragment()
+                    navController.navigate(action)
+                }
             }
         } else {
             Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show()
