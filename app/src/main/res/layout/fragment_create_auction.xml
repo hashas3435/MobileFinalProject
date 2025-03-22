@@ -6,8 +6,6 @@
     android:visibility="visible"
     tools:context="com.example.firstapplication.CreateAuctionFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <ImageView
         android:id="@+id/itemImageView"
         android:layout_width="0dp"
@@ -124,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Starting Bid"
-            android:inputType="number|numberDecimal" />
+            android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <View

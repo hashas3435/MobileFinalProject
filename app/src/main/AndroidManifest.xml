@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/Theme.FirstApplication"
+        android:windowSoftInputMode="adjustNothing"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"

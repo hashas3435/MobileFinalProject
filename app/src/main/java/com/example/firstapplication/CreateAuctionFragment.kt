@@ -12,6 +12,7 @@ import androidx.navigation.Navigation
 import com.example.firstapplication.databinding.FragmentCreateAuctionBinding
 import com.example.firstapplication.model.Auction
 import com.example.firstapplication.model.AuctionModel
+import com.example.firstapplication.model.UserModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -75,10 +76,10 @@ class CreateAuctionFragment : Fragment() {
             id = "",
             title = binding.titleEditText.text.toString(),
             description = binding.descriptionEditText.text.toString(),
-            currentBid = binding.startingBidEditText.text.toString().toInt(),
+            currentBid = binding.startingBidEditText.text.toString().toDoubleOrNull() ?: 0.0,
             endDate = pickedTimestamp,
             imageUrl = "",
-            seller = "" // TODO: use logged user
+            seller = UserModel.shared.loggedUser?.id ?: ""
         )
 
         if (didSetProfileImage) {

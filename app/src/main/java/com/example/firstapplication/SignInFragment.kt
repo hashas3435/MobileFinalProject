@@ -8,158 +8,166 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
-import com.example.firstapplication.model.Model
-import com.example.firstapplication.model.User
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.firstapplication.databinding.FragmentSignInBinding
+import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
+const val MIN_PASSWORD_LENGTH = 6
+
 class SignInFragment : Fragment() {
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private var binding: FragmentSignInBinding? = null
 
-
-    private var emailField: TextInputEditText? = null
-    private var emailLayout: TextInputLayout? = null
-    private var passwordField: TextInputEditText? = null
-    private var passwordLayout: TextInputLayout? = null
-    private var forgotPasswordField: TextView? = null
-    private var loginButton: Button? = null
-    private var register: LinearLayout? = null
-    private var progressBar: ProgressBar? = null
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_sign_in, container, false)
+    ): View {
+        val binding = FragmentSignInBinding.inflate(inflater, container, false)
+        this.binding = binding
 
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
-
-        emailField = view.findViewById(R.id.email)
-        emailLayout = view.findViewById(R.id.email_layout)
-        passwordField = view.findViewById(R.id.password)
-        passwordLayout = view.findViewById(R.id.password_layout)
-        forgotPasswordField = view.findViewById(R.id.forgot_password)
-        loginButton = view.findViewById(R.id.login_button)
-        register = view.findViewById(R.id.register_layout)
-        progressBar = view.findViewById(R.id.progress_bar)
-
-        loginButton?.setOnClickListener {
+        binding.loginButton.setOnClickListener {
             loginUser()
         }
-
-        register?.setOnClickListener {
-            findNavController(view).navigate(R.id.action_signInFragment_to_registerFragment)
+        binding.register.setOnClickListener {
+            val action = SignInFragmentDirections.actionSignInFragmentToRegisterFragment()
+            findNavController(binding.root).navigate(action)
         }
-
-        forgotPasswordField?.setOnClickListener {
-            val email = emailField?.text.toString().trim()
+        binding.forgotPassword.setOnClickListener {
+            val email = binding.email.text.toString().trim()
             if (isValidEmail(email)) {
                 sendPasswordResetEmail(email)
             } else {
-                Toast.makeText(requireContext(), "Please enter a valid email address", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter a valid email address",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
-        return view
+        return binding.root
+    }
+
+    private fun getBinding(): FragmentSignInBinding {
+        return binding ?: throw IllegalStateException("AuctionRoomFragment binding is null")
     }
 
     private fun loginUser() {
-        val email = emailField?.text.toString().trim()
-        val password = passwordField?.text.toString().trim()
+        val binding = getBinding()
+        val email = binding.email.text.toString().trim()
+        val password = binding.password.text.toString().trim()
 
         if (!checkInput(email, password)) {
             return
         }
 
-        progressBar?.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-
-                    updateUserModel(user?.uid ?: "") {
-                        progressBar?.visibility = View.GONE
-
-                        Toast.makeText( requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
-
-                        startActivity(Intent(requireContext(), MainActivity::class.java))
-                        requireActivity().finish()
-                    }
+                    onSuccessfulSignIn(user)
                 } else {
-                    progressBar?.visibility = View.GONE
-                    Log.d("SIGN_IN", "Authentication failed: ${task.exception?.message}")
-                    Toast.makeText(requireContext(), "Password and email does not match", Toast.LENGTH_SHORT).show()
+                    onFailedSignIn(task.exception)
                 }
             }
     }
 
+    private fun onSuccessfulSignIn(authUser: FirebaseUser?) {
+        val binding = getBinding()
+
+        if (authUser !== null && authUser.uid.isNotBlank()) {
+            UserModel.shared.getUserById(authUser.uid) { userData ->
+                UserModel.shared.loggedUser = userData
+                Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+
+                startActivity(Intent(requireContext(), MainActivity::class.java))
+                requireActivity().finish()
+            }
+        } else {
+            Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show()
+            binding.progressBar.visibility = View.GONE
+        }
+    }
+
+    private fun onFailedSignIn(exception: Exception?) {
+        val binding = getBinding()
+
+        binding.progressBar.visibility = View.GONE
+        Log.d("SIGN_IN", "Authentication failed: ${exception?.message}")
+        Toast.makeText(
+            requireContext(),
+            "Password and email does not match",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 
     private fun checkInput(email: String, password: String): Boolean {
-        var valid = true
+        val isValidEmail = validateEmail(email)
+        val isValidPassword = validatePassword(password)
 
-        if (TextUtils.isEmpty(email)) {
-            emailLayout?.error = "Required"
-            valid = false
-        } else if (!isValidEmail(email)) {
-            emailLayout?.error = "Enter a valid email address"
-            valid = false
-        } else {
-            emailLayout?.error = null
-        }
-
-        if (TextUtils.isEmpty(password)) {
-            passwordLayout?.error = "Required"
-            valid = false
-        } else if (password.length < 6) {
-            passwordLayout?.error = "Password must be at least 6 characters"
-            valid = false
-        } else {
-            passwordLayout?.error = null
-        }
-
-        return valid
+        return isValidEmail && isValidPassword
     }
 
     private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    private fun updateUserModel(uid: String, callback: () -> Unit){
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val fullName = document.getString("fullName") ?: "No name"
-                    val email = document.getString("email") ?: "No email"
-                    val phone = document.getString("phone") ?: "No phone"
+    private fun validateEmail(email: String): Boolean {
+        val binding = getBinding()
+        var error: String? = null
 
-                    Model.shared.user = User(fullName, email, phone)
-                }
+        if (TextUtils.isEmpty(email)) {
+            error = "Email is required"
+        } else if (!isValidEmail(email)) {
+            error = "Enter a valid email address"
+        }
+        binding.emailLayout.error = error
 
-                callback()
-            }
+        return error !== null
+    }
+
+    private fun validatePassword(password: String): Boolean {
+        val binding = getBinding()
+        var error: String? = null
+
+        if (TextUtils.isEmpty(password)) {
+            error = "Password is required"
+        } else if (password.length < MIN_PASSWORD_LENGTH) {
+            error = "Password must be at least $MIN_PASSWORD_LENGTH characters"
+        }
+        binding.passwordLayout.error = error
+
+        return error !== null
     }
 
     private fun sendPasswordResetEmail(email: String) {
-        progressBar?.visibility = View.VISIBLE
+        val binding = getBinding()
+        binding.progressBar.visibility = View.VISIBLE
 
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
-                progressBar?.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 if (task.isSuccessful) {
-                    Toast.makeText(requireContext(), "Password reset email sent", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Password reset email sent",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    Toast.makeText(requireContext(), "Failed to send reset email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to send reset email: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
     }
