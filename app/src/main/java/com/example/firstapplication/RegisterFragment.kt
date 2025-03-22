@@ -183,4 +183,9 @@ class RegisterFragment : Fragment() {
         binding.confirmPasswordLayout.error = error
         return error === null
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+    }
 }

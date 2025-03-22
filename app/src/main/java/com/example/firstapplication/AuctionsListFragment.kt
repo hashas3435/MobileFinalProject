@@ -77,7 +77,7 @@ class AuctionsListFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+//        binding = null
     }
 
     private fun getAllAuctions() {

@@ -179,4 +179,9 @@ class SignInFragment : Fragment() {
                 }
             }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+    }
 }

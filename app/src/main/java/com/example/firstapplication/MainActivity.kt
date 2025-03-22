@@ -35,6 +35,13 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_bar)
         bottomNavigationView.updatePadding(bottom = 0)
         navController?.let { NavigationUI.setupWithNavController(bottomNavigationView, it) }
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            val currentDestination = navController?.currentDestination?.id
+            if (currentDestination != item.itemId) {
+                navController?.navigate(item.itemId)
+            }
+            true
+        }
         navController?.addOnDestinationChangedListener { _, destination, _ ->
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
             // hide navigation bar on login and register
