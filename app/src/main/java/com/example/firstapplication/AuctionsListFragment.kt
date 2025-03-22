@@ -11,6 +11,9 @@ import com.example.firstapplication.databinding.FragmentCreateAuctionBinding
 
 class AuctionsListFragment : Fragment() {
     private var binding: FragmentAuctionsListBinding? = null
+    private var adapter: AuctionsRecyclerAdapter? = null
+    private var viewModel: StudentsListViewModel? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
