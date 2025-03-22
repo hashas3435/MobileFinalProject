@@ -1,7 +1,6 @@
-package com.idz.colman24class2
+package com.example.firstapplication.model
 
 import androidx.lifecycle.ViewModel
-import com.example.firstapplication.model.Auction
 
 class AuctionsListViewModel : ViewModel() {
     private var _auctions: List<Auction>? = null
@@ -11,7 +10,7 @@ class AuctionsListViewModel : ViewModel() {
             _auctions = value
         }
 
-    fun set(students: List<Auction>?) {
-        this.auctions = students
+    fun set(auctions: List<Auction>?) {
+        this.auctions = auctions
     }
 }

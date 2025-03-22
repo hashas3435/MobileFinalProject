@@ -8,13 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.firstapplication.adapter.AuctionsRecyclerAdapter
 import com.example.firstapplication.adapter.OnItemClickListener
 import com.example.firstapplication.databinding.FragmentAuctionsListBinding
 import com.example.firstapplication.model.Auction
-import com.idz.colman24class2.AuctionsListViewModel
+import com.example.firstapplication.model.AuctionModel
+import com.example.firstapplication.model.AuctionsListViewModel
 
 
 class AuctionsListFragment : Fragment() {
@@ -39,7 +39,15 @@ class AuctionsListFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         binding?.recyclerView?.layoutManager = layoutManager
 
-        adapter = AuctionsRecyclerAdapter(viewModel?.auctions)
+        val DEFAULT_AUCTIONS: List<Auction> = mutableListOf(Auction(id="1",
+            title="1",
+            description="1",
+            endDate = 0L,
+            imageUrl="1",
+            currentBid=0.0,
+            seller="1"))
+
+        adapter = AuctionsRecyclerAdapter(viewModel?.auctions ?: DEFAULT_AUCTIONS)
 
         adapter?.listener = object : OnItemClickListener {
             override fun onItemClick(position: Int) {
@@ -47,12 +55,12 @@ class AuctionsListFragment : Fragment() {
             }
 
             override fun onItemClick(auction: Auction?) {
-//                auction?.let {
+                auction?.let {
 //                    val action = AuctionsListFragmentDirections.actionStudentsListFragmentToBlueFragment(it.name)
 //                    binding?.root?.let {
 //                        Navigation.findNavController(it).navigate(action)
 //                    }
-//                }
+                }
             }
         }
 
@@ -78,12 +86,13 @@ class AuctionsListFragment : Fragment() {
 
         binding?.progressBar?.visibility = View.VISIBLE
 
-//        Model.shared.getAllStudents {
-//            viewModel?.set(students = it)
-//            adapter?.set(it)
-//            adapter?.notifyDataSetChanged()
-//
-//            binding?.progressBar?.visibility = View.GONE
-//        }
+        AuctionModel.shared.getAllAuctions {
+            viewModel?.set(auctions = it)
+            adapter?.update(it)
+            adapter?.notifyDataSetChanged()
+
+            binding?.progressBar?.visibility = View.GONE
+        }
+
     }
 }
