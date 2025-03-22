@@ -11,13 +11,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
+import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentSignInBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-
-const val MIN_PASSWORD_LENGTH = 6
 
 class SignInFragment : Fragment() {
     private var binding: FragmentSignInBinding? = null
@@ -82,7 +81,6 @@ class SignInFragment : Fragment() {
 
     private fun onSuccessfulSignIn(authUser: FirebaseUser?) {
         val binding = getBinding()
-
         if (authUser !== null && authUser.uid.isNotBlank()) {
             UserModel.shared.getUserById(authUser.uid) { userData ->
                 UserModel.shared.loggedUser = userData
@@ -102,7 +100,6 @@ class SignInFragment : Fragment() {
         val binding = getBinding()
 
         binding.progressBar.visibility = View.GONE
-        Log.d("SIGN_IN", "Authentication failed: ${exception?.message}")
         Toast.makeText(
             requireContext(),
             "Password and email does not match",
@@ -132,21 +129,22 @@ class SignInFragment : Fragment() {
         }
         binding.emailLayout.error = error
 
-        return error !== null
+        return error === null
     }
 
     private fun validatePassword(password: String): Boolean {
         val binding = getBinding()
         var error: String? = null
+        val minLength = Constants.LOGIN_VALIDATION.MIN_PASSWORD_LENGTH
 
         if (TextUtils.isEmpty(password)) {
             error = "Password is required"
-        } else if (password.length < MIN_PASSWORD_LENGTH) {
-            error = "Password must be at least $MIN_PASSWORD_LENGTH characters"
+        } else if (password.length < minLength) {
+            error = "Password must be at least $minLength characters"
         }
         binding.passwordLayout.error = error
 
-        return error !== null
+        return error === null
     }
 
     private fun sendPasswordResetEmail(email: String) {

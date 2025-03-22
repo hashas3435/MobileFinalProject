@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
+import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentRegisterBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
@@ -114,7 +115,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.fullNameLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun isValidEmail(email: String): Boolean {
@@ -133,7 +134,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.emailLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun isValidPhoneNumber(phone: String): Boolean {
@@ -152,21 +153,22 @@ class RegisterFragment : Fragment() {
         }
 
         binding.phoneLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun validatePassword(password: String): Boolean {
         val binding = getBinding()
         var error: String? = null
+        val minLength = Constants.LOGIN_VALIDATION.MIN_PASSWORD_LENGTH
 
         if (TextUtils.isEmpty(password)) {
             error = "Required"
-        } else if (password.length < 6) {
-            error = "Password must be at least 6 characters"
+        } else if (password.length < minLength) {
+            error = "Password must be at least $minLength characters"
         }
 
         binding.passwordLayout.error = error
-        return error !== null
+        return error === null
     }
 
     private fun validateConfirmPassword(password: String, confirmPassword: String): Boolean {
@@ -180,6 +182,6 @@ class RegisterFragment : Fragment() {
         }
 
         binding.confirmPasswordLayout.error = error
-        return error !== null
+        return error === null
     }
 }
