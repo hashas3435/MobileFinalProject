@@ -81,7 +81,6 @@ class SignInFragment : Fragment() {
 
     private fun onSuccessfulSignIn(authUser: FirebaseUser?) {
         val binding = getBinding()
-
         if (authUser !== null && authUser.uid.isNotBlank()) {
             UserModel.shared.getUserById(authUser.uid) { userData ->
                 UserModel.shared.loggedUser = userData
@@ -101,7 +100,6 @@ class SignInFragment : Fragment() {
         val binding = getBinding()
 
         binding.progressBar.visibility = View.GONE
-        Log.d("SIGN_IN", "Authentication failed: ${exception?.message}")
         Toast.makeText(
             requireContext(),
             "Password and email does not match",
@@ -131,7 +129,7 @@ class SignInFragment : Fragment() {
         }
         binding.emailLayout.error = error
 
-        return error !== null
+        return error === null
     }
 
     private fun validatePassword(password: String): Boolean {
@@ -146,7 +144,7 @@ class SignInFragment : Fragment() {
         }
         binding.passwordLayout.error = error
 
-        return error !== null
+        return error === null
     }
 
     private fun sendPasswordResetEmail(email: String) {
