@@ -48,7 +48,7 @@ class AuctionRoomFragment : Fragment() {
         binding.currentBidTextView.text = createCurrentBidText(0.0)
         fetchAuction()
 
-        binding.setBidTextEdit.addTextChangedListener(object: TextWatcher {
+        binding.setBidTextEdit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(editText: Editable?) {
                 validateBidInput()
             }
@@ -89,20 +89,13 @@ class AuctionRoomFragment : Fragment() {
         val auctionId = this.auctionId ?: throw IllegalArgumentException("auctionId is null")
         binding.progressBar.visibility = View.VISIBLE
 
-        AuctionModel.shared.getAuctionById(auctionId) { auctionData, exception ->
-            if (exception !== null) {
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to fetch auction",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Log.e("AuctionRoom", "failed fetching auction $auctionId", exception)
-                Navigation.findNavController(binding.root).popBackStack()
-            } else if (auctionData !== null) {
+        AuctionModel.shared.getAuctionById(auctionId) { auctionData ->
+            if (auctionData !== null) {
                 this@AuctionRoomFragment.auction = auctionData
                 updateAuctionView(auctionData)
             } else {
-                Toast.makeText(requireContext(), "auction not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "failed to get auction", Toast.LENGTH_SHORT).show()
+                Navigation.findNavController(binding.root).popBackStack()
             }
             binding.progressBar.visibility = View.GONE
         }
@@ -146,12 +139,12 @@ class AuctionRoomFragment : Fragment() {
         val newBid = binding.setBidTextEdit.text.toString().toDouble()
         auctionId?.let {
             binding.progressBar.visibility = View.VISIBLE
-            AuctionModel.shared.placeBid(it, newBid) { success, exception ->
+            AuctionModel.shared.placeBid(it, newBid) { success ->
                 binding.progressBar.visibility = View.GONE
                 if (success) {
                     onSuccessPlaceBid(newBid)
                 } else {
-                    onFailedPlaceBid(exception)
+                    onFailedPlaceBid()
                 }
             }
         }
@@ -166,20 +159,12 @@ class AuctionRoomFragment : Fragment() {
         Toast.makeText(requireContext(), "Bid placed successfully!", Toast.LENGTH_SHORT).show()
     }
 
-    private fun onFailedPlaceBid(exception: Exception?) {
-        if (exception !== null) {
-            Toast.makeText(
-                requireContext(),
-                "Failed to place bid: ${exception.message}",
-                Toast.LENGTH_SHORT
-            ).show()
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Bid is too low",
-                Toast.LENGTH_SHORT
-            ).show()
-            fetchAuction()
-        }
+    private fun onFailedPlaceBid() {
+        Toast.makeText(
+            requireContext(),
+            "Failed to place bid",
+            Toast.LENGTH_SHORT
+        ).show()
+        fetchAuction()
     }
 }

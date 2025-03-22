@@ -1,40 +1,39 @@
 package com.example.firstapplication.model
 
 import android.graphics.Bitmap
+import android.util.Log
+import com.example.firstapplication.base.EmptyCallback
 
 typealias AuctionsListCallback = (List<Auction>) -> Unit
-typealias AuctionCallback = (Auction?, Exception?) -> Unit
-typealias CreatedDocumentCallback = (String?, Exception?) -> Unit
-typealias UpdateBidCallback = (Boolean, Exception?) -> Unit
-typealias NullableExceptionCallback = (Exception?) -> Unit
+typealias AuctionCallback = (Auction?) -> Unit
+typealias UpdateBidCallback = (Boolean) -> Unit
+
+private const val LOG_TAG = "AuctionModel"
 
 class AuctionModel private constructor() {
-    private val firebaseModel = FirebaseModel()
+    private val auctionFirebaseModel = AuctionFirebaseModel()
 
     companion object {
         val shared = AuctionModel()
     }
 
     fun getAllAuctions(callback: AuctionsListCallback) {
-        firebaseModel.getAllAuctions(callback)
+        auctionFirebaseModel.getAllAuctions(callback)
     }
 
     fun getAuctionById(auctionId: String, callback: AuctionCallback) {
-        firebaseModel.getAuctionById(auctionId, callback)
+        auctionFirebaseModel.getAuctionById(auctionId, callback)
     }
 
-    fun addAuction(auction: Auction, itemImage: Bitmap?, callback: NullableExceptionCallback) {
-        firebaseModel.add(auction) { auctionId, exception ->
-            if (exception !== null) {
-                callback(exception)
+    fun addAuction(auction: Auction, itemImage: Bitmap?, callback: EmptyCallback) {
+        auctionFirebaseModel.add(auction) { auctionId ->
+            if (!auctionId.isNullOrBlank() && itemImage !== null) {
+                updateAuctionImage(auctionId, itemImage, callback)
             } else {
-                if (!auctionId.isNullOrBlank() && itemImage !== null) {
-                    updateAuctionImage(auctionId, itemImage, callback)
-                } else if (auctionId.isNullOrBlank()) {
-                    callback(IllegalStateException("failed getting id for the new auction in firestore"))
-                } else {
-                    callback(null)
+                if (auctionId.isNullOrBlank()) {
+                    Log.e(LOG_TAG, "failed getting id for the new auction in firestore")
                 }
+                callback()
             }
         }
     }
@@ -42,20 +41,20 @@ class AuctionModel private constructor() {
     private fun updateAuctionImage(
         auctionId: String,
         image: Bitmap,
-        callback: NullableExceptionCallback
+        callback: EmptyCallback
     ) {
         uploadImageToFirebase(image, auctionId) { uri ->
             uri?.let {
-                firebaseModel.updateImageUrl(auctionId, uri, callback)
+                auctionFirebaseModel.updateImageUrl(auctionId, uri, callback)
             }
         }
     }
 
     private fun uploadImageToFirebase(image: Bitmap, name: String, callback: (String?) -> Unit) {
-        firebaseModel.uploadImage(image, name, callback)
+        auctionFirebaseModel.uploadImage(image, name, callback)
     }
 
     fun placeBid(auctionId: String, bid: Double, callback: UpdateBidCallback) {
-        firebaseModel.placeBid(auctionId, bid, callback)
+        auctionFirebaseModel.placeBid(auctionId, bid, callback)
     }
 }

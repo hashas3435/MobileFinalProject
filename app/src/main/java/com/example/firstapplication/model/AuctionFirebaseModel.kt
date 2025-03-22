@@ -1,28 +1,19 @@
 package com.example.firstapplication.model
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.example.firstapplication.base.Constants
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.firestoreSettings
-import com.google.firebase.firestore.memoryCacheSettings
-import com.google.firebase.storage.storage
+import com.example.firstapplication.base.EmptyCallback
+import com.example.firstapplication.base.StringCallback
 import java.io.ByteArrayOutputStream
 
-class FirebaseModel {
-    private val database = Firebase.firestore
-    private val storage = Firebase.storage
+private const val LOG_TAG = "AuctionFirebaseModel"
 
-    init {
-        val setting = firestoreSettings {
-            setLocalCacheSettings(memoryCacheSettings { })
-        }
-
-        database.firestoreSettings = setting
-    }
+class AuctionFirebaseModel {
+    private val firebaseModel = FirebaseModel()
 
     fun getAllAuctions(callback: AuctionsListCallback) {
-        database.collection(Constants.COLLECTIONS.AUCTIONS).get()
+        firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS).get()
             .addOnCompleteListener {
                 when (it.isSuccessful) {
                     true -> {
@@ -35,72 +26,94 @@ class FirebaseModel {
                         callback(auctions)
                     }
 
-                    false -> callback(listOf())
+                    false -> {
+                        Log.e(LOG_TAG, "failed fetching auctions list", it.exception)
+                        callback(listOf())
+                    }
                 }
             }
     }
 
     fun getAuctionById(auctionId: String, callback: AuctionCallback) {
-        database.collection(Constants.COLLECTIONS.AUCTIONS)
+        firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS)
             .document(auctionId)
             .get()
             .addOnSuccessListener { document ->
                 val data = document.data
-                data?.let {
-                    it[Auction.ID_KEY] = document.id
-                    val auction = Auction.fromJSON(it)
-                    callback(auction, null)
-                } ?: callback(null, IllegalStateException("auction $auctionId data is null"))
+                if (data.isNullOrEmpty()) {
+                    Log.e(LOG_TAG, "auction $auctionId not found")
+                    callback(null)
+                } else {
+                    data[Auction.ID_KEY] = document.id
+                    val auction = Auction.fromJSON(data)
+                    callback(auction)
+                }
             }
             .addOnFailureListener { exception ->
-                callback(null, exception)
+                Log.e(LOG_TAG, "failed getting auction $auctionId", exception)
+                callback(null)
             }
     }
 
-    fun add(auction: Auction, callback: CreatedDocumentCallback) {
+    fun add(auction: Auction, callback: StringCallback) {
         val auctionDataToAdd = auction.json
         auctionDataToAdd.remove(Auction.ID_KEY)
 
-        database.collection(Constants.COLLECTIONS.AUCTIONS)
+        firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS)
             .add(auctionDataToAdd)
             .addOnSuccessListener { documentReference ->
-                callback(documentReference.id, null)  // Return the generated document ID
+                callback(documentReference.id)  // Return the generated document ID
             }
-            .addOnFailureListener { e ->
-                callback(null, e)  // Return error if something goes wrong
+            .addOnFailureListener { exception ->
+                callback(null)  // Return error if something goes wrong
             }
     }
 
-    fun updateImageUrl(auctionId: String, uri: String, callback: NullableExceptionCallback) {
-        database.collection(Constants.COLLECTIONS.AUCTIONS)
+    fun updateImageUrl(auctionId: String, uri: String, callback: EmptyCallback) {
+        firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS)
             .document(auctionId)
             .update(Auction.IMAGE_URL_KEY, uri)
-            .addOnSuccessListener {
-                callback(null)
+            .addOnCompleteListener {
+                if (!it.isSuccessful) {
+                    Log.e(LOG_TAG, "failed to update image for auction $auctionId", it.exception)
+                }
+                callback()
             }
-            .addOnFailureListener(callback)
     }
 
-    fun uploadImage(image: Bitmap, name: String, callback: (String?) -> Unit) {
-        val storageRef = storage.reference
-        val imageProfileRef = storageRef.child("images/$name.jpg")
+    fun uploadImage(image: Bitmap, auctionId: String, callback: StringCallback) {
+        val storageRef = firebaseModel.storage.reference
+        val imageProfileRef = storageRef.child("images/$auctionId.jpg")
         val baos = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
 
         val uploadTask = imageProfileRef.putBytes(data)
         uploadTask
-            .addOnFailureListener { callback(null) }
-            .addOnSuccessListener { taskSnapshot ->
-                imageProfileRef.downloadUrl.addOnSuccessListener { uri ->
-                    callback(uri.toString())
-                }
+            .addOnFailureListener { exception ->
+                Log.e(LOG_TAG, "failed to upload image for auction $auctionId", exception)
+                callback(null)
+            }
+            .addOnSuccessListener { _ ->
+                imageProfileRef.downloadUrl
+                    .addOnSuccessListener { uri ->
+                        callback(uri.toString())
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e(
+                            LOG_TAG,
+                            "failed downloading image url for auction $auctionId",
+                            exception
+                        )
+                        callback(null)
+                    }
             }
     }
 
     fun placeBid(auctionId: String, bid: Double, callback: UpdateBidCallback) {
-        val auctionRef = database.collection(Constants.COLLECTIONS.AUCTIONS).document(auctionId)
-        database.runTransaction { transaction ->
+        val auctionRef =
+            firebaseModel.database.collection(Constants.COLLECTIONS.AUCTIONS).document(auctionId)
+        firebaseModel.database.runTransaction { transaction ->
             val snapshot = transaction.get(auctionRef)
             val currentBid = snapshot.getDouble(Auction.CURRENT_BID_KEY) ?: 0.0
 
@@ -111,9 +124,10 @@ class FirebaseModel {
                 false
             }
         }.addOnSuccessListener { success ->
-            callback(success, null)
-        }.addOnFailureListener { e ->
-            callback(false, e)
+            callback(success)
+        }.addOnFailureListener { exception ->
+            Log.e(LOG_TAG, "failed to place bid $bid for auction $auctionId", exception)
+            callback(false)
         }
     }
 }
