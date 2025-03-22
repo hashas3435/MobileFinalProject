@@ -40,19 +40,18 @@ class AuctionsListFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         binding?.recyclerView?.layoutManager = layoutManager
 
-        val DEFAULT_AUCTIONS: List<Auction> = mutableListOf(Auction(id="1",
-            title="1",
-            description="1",
-            endDate = 0L,
-            imageUrl="1",
-            currentBid=0.0,
-            seller="1"))
-
-        adapter = AuctionsRecyclerAdapter(viewModel?.auctions ?: DEFAULT_AUCTIONS)
+        adapter = AuctionsRecyclerAdapter(viewModel?.auctions)
 
         adapter?.listener = object : OnItemClickListener {
             override fun onItemClick(position: Int) {
-                Log.d("TAG", "On click Activity listener on position $position")
+                val auctions:List<Auction>? = viewModel?.auctions
+                if (auctions !== null && auctions.size > position ){
+                    val action = AuctionsListFragmentDirections.
+                    actionAuctionsListFragmentToAuctionRoomFragment(auctions.get(position).id)
+                    binding?.root?.let {
+                        Navigation.findNavController(it).navigate(action)
+                    }
+                }
             }
 
             override fun onItemClick(auction: Auction?) {
