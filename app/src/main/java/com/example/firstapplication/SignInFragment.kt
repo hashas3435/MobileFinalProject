@@ -135,7 +135,7 @@ class SignInFragment : Fragment() {
     private fun validatePassword(password: String): Boolean {
         val binding = getBinding()
         var error: String? = null
-        val minLength = Constants.COLLECTIONS.MIN_PASSWORD_LENGTH
+        val minLength = Constants.LOGIN_VALIDATION.MIN_PASSWORD_LENGTH
 
         if (TextUtils.isEmpty(password)) {
             error = "Password is required"
