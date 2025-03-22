@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/signInFragment">
-
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.example.firstapplication.SignInFragment"
@@ -19,8 +18,7 @@
         android:id="@+id/registerFragment"
         android:name="com.example.firstapplication.RegisterFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" >
-    </fragment>
+        tools:layout="@layout/fragment_register" />
     <fragment
         android:id="@+id/auctionRoomFragment"
         android:name="com.example.firstapplication.AuctionRoomFragment"
@@ -31,9 +29,9 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/createAuctionFragment2"
+        android:id="@+id/createAuctionFragment"
         android:name="com.example.firstapplication.CreateAuctionFragment"
         android:label="fragment_create_auction"
         tools:layout="@layout/fragment_create_auction" />
-    <action android:id="@+id/action_global_createAuctionFragment2" app:destination="@id/createAuctionFragment2" />
+    <action android:id="@+id/action_global_createAuctionFragment" app:destination="@id/createAuctionFragment" />
 </navigation>
