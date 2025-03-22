@@ -70,7 +70,7 @@ class RegisterFragment : Fragment() {
                             Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT)
                                 .show()
 
-                            val action = SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
+                            val action = RegisterFragmentDirections.actionRegisterFragmentToAuctionsListFragment()
                             findNavController(binding.root).navigate(action)
                         } else {
                             Toast.makeText(

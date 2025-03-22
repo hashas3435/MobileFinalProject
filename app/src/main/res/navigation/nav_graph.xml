@@ -21,16 +21,17 @@
         android:id="@+id/registerFragment"
         android:name="com.example.firstapplication.RegisterFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_auctionsListFragment"
+            app:destination="@id/auctionsListFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/auctionsListFragment"
         android:name="com.example.firstapplication.AuctionsListFragment"
         android:label="fragment_auctions_list"
         tools:layout="@layout/fragment_auctions_list">
-        <action
-            android:id="@+id/action_auctionsListFragment_to_createAuctionFragment"
-            app:destination="@id/createAuctionFragment" />
         <action
             android:id="@+id/action_auctionsListFragment_to_auctionRoomFragment"
             app:destination="@id/auctionRoomFragment"/>

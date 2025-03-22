@@ -68,9 +68,6 @@ class AuctionsListFragment : Fragment() {
 
         binding?.recyclerView?.adapter = adapter
 
-        val action = AuctionsListFragmentDirections.actionAuctionsListFragmentToCreateAuctionFragment()
-        binding?.addAuctionButton?.setOnClickListener(Navigation.createNavigateOnClickListener(action))
-
         return binding?.root
     }
 
