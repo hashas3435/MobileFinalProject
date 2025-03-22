@@ -19,6 +19,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            "String",
+            "CLOUDINARY_CLOUD_NAME",
+            "\"${project.properties["CLOUDINARY_CLOUD_NAME"] ?: ""}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_API_KEY",
+            "\"${project.properties["CLOUDINARY_API_KEY"] ?: ""}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_API_SECRET",
+            "\"${project.properties["CLOUDINARY_API_SECRET"] ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -40,6 +55,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
 
 }
@@ -74,7 +90,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.storage)
 
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -82,4 +97,7 @@ dependencies {
 
     // Picasso
     implementation(libs.picasso)
+
+    // Cloudinary
+    implementation(libs.cloudinary.android)
 }
