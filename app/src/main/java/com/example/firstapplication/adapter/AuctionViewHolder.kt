@@ -8,7 +8,10 @@ import com.example.firstapplication.databinding.AuctionListRowBinding
 import com.example.firstapplication.model.Auction
 import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
@@ -48,6 +51,11 @@ class AuctionViewHolder(
         if (endDate === null ){
             return ""
         }
-        return SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(Date(endDate))
+        val displayDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(Date(endDate))
+        val date = Instant.ofEpochMilli(endDate).atZone(ZoneId.systemDefault()).toLocalDate()
+        val currentDate: LocalDate = LocalDate.now()
+        val difference = ChronoUnit.DAYS.between(currentDate, date)
+
+        return "$displayDate ($difference days left)"
     }
 }

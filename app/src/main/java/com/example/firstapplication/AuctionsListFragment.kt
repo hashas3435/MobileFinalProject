@@ -85,7 +85,7 @@ class AuctionsListFragment : Fragment() {
         binding?.progressBar?.visibility = View.VISIBLE
 
         AuctionModel.shared.getAllAuctions {
-            viewModel?.set(auctions = it)
+            viewModel?.set(it)
             adapter?.update(it)
             adapter?.notifyDataSetChanged()
 
