@@ -1,9 +1,7 @@
 package com.example.firstapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -16,13 +14,11 @@ import com.example.firstapplication.databinding.FragmentSignInBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 
 class SignInFragment : Fragment() {
     private var binding: FragmentSignInBinding? = null
 
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -89,7 +85,6 @@ class SignInFragment : Fragment() {
 
                 val action = SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
                 findNavController(binding.root).navigate(action)
-                requireActivity().finish()
             }
         } else {
             Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show()

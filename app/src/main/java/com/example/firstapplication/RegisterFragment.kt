@@ -13,13 +13,11 @@ import com.example.firstapplication.base.Constants
 import com.example.firstapplication.databinding.FragmentRegisterBinding
 import com.example.firstapplication.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterFragment : Fragment() {
     private var binding: FragmentRegisterBinding? = null
 
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -72,9 +70,8 @@ class RegisterFragment : Fragment() {
                             Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT)
                                 .show()
 
-                            val intent = Intent(activity, MainActivity::class.java)
-                            startActivity(intent)
-                            activity?.finishAffinity()
+                            val action = SignInFragmentDirections.actionSignInFragmentToAuctionsListFragment()
+                            findNavController(binding.root).navigate(action)
                         } else {
                             Toast.makeText(
                                 context, "Failed to Register",
