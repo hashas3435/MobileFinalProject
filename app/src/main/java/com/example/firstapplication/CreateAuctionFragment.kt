@@ -82,20 +82,33 @@ class CreateAuctionFragment : Fragment() {
             seller = UserModel.shared.loggedUser?.id ?: ""
         )
 
+        showLoading()
         if (didSetProfileImage) {
             binding.itemImageView.isDrawingCacheEnabled = true
             binding.itemImageView.buildDrawingCache()
             val bitmap = (binding.itemImageView.drawable as BitmapDrawable).bitmap
             AuctionModel.shared.addAuction(auction, bitmap) {
-                binding.progressBar.visibility = View.GONE
+                hideLoading()
                 Navigation.findNavController(view).popBackStack()
             }
         } else {
             AuctionModel.shared.addAuction(auction, null) {
-                binding.progressBar.visibility = View.GONE
+                hideLoading()
                 Navigation.findNavController(view).popBackStack()
             }
         }
+    }
+
+    private fun showLoading() {
+        val binding = getBinding()
+        binding.progressBar.visibility = View.VISIBLE
+        binding.createAuctionButton.isEnabled = false
+    }
+
+    private fun hideLoading() {
+        val binding = getBinding()
+        binding.progressBar.visibility = View.GONE
+        binding.createAuctionButton.isEnabled = true
     }
 
     private fun showFutureDatePicker() {
