@@ -137,7 +137,7 @@ class RegisterFragment : Fragment() {
     }
 
     private fun isValidPhoneNumber(phone: String): Boolean {
-        val regex = Regex("^\\+?[1-9][0-9]{7,14}$")
+        val regex = Regex("^05\\d{8}\$")
         return phone.matches(regex)
     }
 
