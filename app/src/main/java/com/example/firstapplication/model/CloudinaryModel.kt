@@ -12,6 +12,8 @@ import com.example.firstapplication.base.MyApplication
 import com.example.firstapplication.base.StringCallback
 import com.example.firstapplication.utils.extensions.toFile
 
+private const val LOG_TAG = "CloudinaryModel"
+
 class CloudinaryModel {
     init {
         val config = mapOf(
@@ -37,11 +39,23 @@ class CloudinaryModel {
             .option(
                 "folder",
                 "images"
-            ) // Optional: Specify a folder in your Cloudinary account
+            )
             .callback(object : UploadCallback {
-                override fun onStart(requestId: String) {}
+                override fun onStart(requestId: String) {
+                    Log.i(LOG_TAG, "start uploading image $name to cloudinary ($requestId)")
+                }
 
-                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
+                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
+                    Log.i(
+                        LOG_TAG,
+                        "uploading image $name; ${
+                            String.format(
+                                "%.2f",
+                                bytes / totalBytes
+                            )
+                        } ($bytes / $totalBytes)"
+                    )
+                }
 
                 override fun onSuccess(requestId: String, resultData: Map<*, *>) {
                     val publicUrl = resultData["secure_url"] as? String ?: ""
@@ -50,13 +64,18 @@ class CloudinaryModel {
 
                 override fun onError(requestId: String?, error: ErrorInfo?) {
                     Log.e(
-                        "CloudinaryModel",
+                        LOG_TAG,
                         "Failed to upload image $name { code: ${error?.code}, description: ${error?.description} }"
                     )
                     callback(null)
                 }
 
-                override fun onReschedule(requestId: String?, error: ErrorInfo?) {}
+                override fun onReschedule(requestId: String?, error: ErrorInfo?) {
+                    Log.e(
+                        LOG_TAG,
+                        "Reschedule to upload image $name { code: ${error?.code}, description: ${error?.description} }"
+                    )
+                }
             })
             .dispatch()
     }

@@ -44,7 +44,9 @@ class AuctionModel private constructor() {
         image: Bitmap,
         callback: IsSuccessfulCallback
     ) {
+        Log.i(LOG_TAG, "start uploading image for auction $auctionId")
         uploadImageToFirebase(image, auctionId) { uri ->
+            Log.i(LOG_TAG, "done uploading image for auction $auctionId, url: $uri")
             uri?.let {
                 auctionFirebaseModel.updateImageUrl(auctionId, uri, callback)
             }
