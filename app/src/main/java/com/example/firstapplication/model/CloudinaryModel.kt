@@ -26,7 +26,7 @@ class CloudinaryModel {
             MediaManager.init(it, config)
             MediaManager.get().globalUploadPolicy = GlobalUploadPolicy.Builder()
                 .maxConcurrentRequests(3)
-                .networkPolicy(UploadPolicy.NetworkType.UNMETERED)
+                .networkPolicy(UploadPolicy.NetworkType.ANY)
                 .build()
         }
     }
@@ -45,17 +45,7 @@ class CloudinaryModel {
                     Log.i(LOG_TAG, "start uploading image $name to cloudinary ($requestId)")
                 }
 
-                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
-                    Log.i(
-                        LOG_TAG,
-                        "uploading image $name; ${
-                            String.format(
-                                "%.2f",
-                                bytes / totalBytes
-                            )
-                        } ($bytes / $totalBytes)"
-                    )
-                }
+                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) { }
 
                 override fun onSuccess(requestId: String, resultData: Map<*, *>) {
                     val publicUrl = resultData["secure_url"] as? String ?: ""
